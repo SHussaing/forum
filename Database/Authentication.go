@@ -36,3 +36,22 @@ func InsertUser(email, username, password string) error {
 
 	return nil
 }
+
+// AuthenticateUser checks if the email and password match
+func AuthenticateUser(email, password string) error {
+	// Get the hashed password from the database
+	var hashedPassword string
+	query := `SELECT password FROM User WHERE email = ?`
+	err := db.QueryRow(query, email).Scan(&hashedPassword)
+	if err != nil {
+		return fmt.Errorf("failed to get hashed password: %v", err)
+	}
+
+	// Compare the hashed password with the input password
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	if err != nil {
+		return errors.New("invalid email or password")
+	}
+
+	return nil
+}
