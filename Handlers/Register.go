@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	db "forum/Database"
 	"net/http"
 )
 
@@ -15,8 +15,11 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("email")
 		username := r.FormValue("username")
 		password := r.FormValue("password")
-
-		fmt.Println("Email: ", email, " Username: ", username, " Password: ", password)
+		err := db.InsertUser(email, username, password)
+		if err != nil {
+			handleError(w, http.StatusBadRequest, err)
+			return
+		}
 
 		// Redirect to index page
 		http.Redirect(w, r, "/", http.StatusSeeOther)
