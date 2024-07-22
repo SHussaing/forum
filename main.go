@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"forum/handlers"
+	handlers "forum/Handlers"
 	"log"
 	"net/http"
 )
@@ -14,6 +14,7 @@ func main() {
 	// Define the routes
 	http.HandleFunc("/", handlers.IndexHandler)
 	http.HandleFunc("/Login", handlers.LoginHandler)
+	http.HandleFunc("/Logout", handlers.LogoutHandler)
 	http.HandleFunc("/Register", handlers.RegisterHandler)
 
 	fmt.Println("Server started at http://localhost:8080")

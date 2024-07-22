@@ -1,4 +1,4 @@
-package database
+package Database
 
 import (
 	"database/sql"
@@ -6,12 +6,12 @@ import (
 	"os"
 )
 
-var db *sql.DB
+var Db *sql.DB
 
 func init() {
 	var err error
 	// Open the SQLite3 database file (creates it if it doesn't exist)
-	db, err = sql.Open("sqlite3", "Database/ForumDatabase.db")
+	Db, err = sql.Open("sqlite3", "Database/ForumDatabase.db")
 	if err != nil {
 		panic(fmt.Sprintf("Failed to open database: %v", err))
 	}
@@ -24,7 +24,7 @@ func init() {
 	}
 
 	// Execute the SQL schema
-	_, err = db.Exec(string(schemaSQL))
+	_, err = Db.Exec(string(schemaSQL))
 	if err != nil {
 		panic(fmt.Sprintf("Failed to execute schema: %v", err))
 	}

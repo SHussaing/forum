@@ -1,6 +1,7 @@
-package database
+package Database
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,7 +16,7 @@ func InsertUser(email, username, password string) error {
 	// Check if email or username already exists
 	var exists bool
 	query := `SELECT EXISTS(SELECT 1 FROM User WHERE email = ? OR username = ?)`
-	err := db.QueryRow(query, email, username).Scan(&exists)
+	err := Db.QueryRow(query, email, username).Scan(&exists)
 	if err != nil {
 		return fmt.Errorf("failed to check if user exists: %v", err)
 	}
@@ -31,7 +32,7 @@ func InsertUser(email, username, password string) error {
 
 	// Insert the new user
 	insertUserSQL := `INSERT INTO User (email, username, password) VALUES (?, ?, ?)`
-	_, err = db.Exec(insertUserSQL, email, username, hashedPassword)
+	_, err = Db.Exec(insertUserSQL, email, username, hashedPassword)
 	if err != nil {
 		return fmt.Errorf("failed to insert user: %v", err)
 	}
@@ -43,7 +44,7 @@ func InsertUser(email, username, password string) error {
 func ValidateUserCredentials(email, password string) (int, error) {
 	var userID int
 	var storedPassword string
-	err := db.QueryRow("SELECT user_ID, password FROM User WHERE email = ?", email).Scan(&userID, &storedPassword)
+	err := Db.QueryRow("SELECT user_ID, password FROM User WHERE email = ?", email).Scan(&userID, &storedPassword)
 	if err != nil {
 		return 0, err
 	}
@@ -59,13 +60,13 @@ func ValidateUserCredentials(email, password string) (int, error) {
 // createSessionAndSetCookie stores the session in the database and sets the session token as a cookie
 func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, expiresAt time.Time) error {
 	// Delete any existing sessions for this user
-	_, err := db.Exec("DELETE FROM Sessions WHERE user_ID = ?", userID)
+	_, err := Db.Exec("DELETE FROM Sessions WHERE user_ID = ?", userID)
 	if err != nil {
 		return err
 	}
 
 	// Store the session in the database
-	_, err = db.Exec("INSERT INTO Sessions (user_ID, token, expires_at) VALUES (?, ?, ?)", userID, token, expiresAt)
+	_, err = Db.Exec("INSERT INTO Sessions (user_ID, token, expires_at) VALUES (?, ?, ?)", userID, token, expiresAt)
 	if err != nil {
 		return err
 	}
@@ -79,4 +80,26 @@ func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, 
 	})
 
 	return nil
+}
+
+func sessionMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("session_token")
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		var userID int
+		var expiresAt time.Time
+		err = Db.QueryRow("SELECT user_ID, expires_at FROM Sessions WHERE token = ?", cookie.Value).Scan(&userID, &expiresAt)
+		if err != nil || time.Now().After(expiresAt) {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		// Add user ID to context
+		ctx := context.WithValue(r.Context(), "userID", userID)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
