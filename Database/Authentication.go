@@ -1,8 +1,10 @@
-package Database
+package database
 
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
@@ -37,21 +39,44 @@ func InsertUser(email, username, password string) error {
 	return nil
 }
 
-// AuthenticateUser checks if the email and password match
-func AuthenticateUser(email, password string) error {
-	// Get the hashed password from the database
-	var hashedPassword string
-	query := `SELECT password FROM User WHERE email = ?`
-	err := db.QueryRow(query, email).Scan(&hashedPassword)
+// validateUserCredentials validates the user credentials and returns the user ID
+func ValidateUserCredentials(email, password string) (int, error) {
+	var userID int
+	var storedPassword string
+	err := db.QueryRow("SELECT user_ID, password FROM User WHERE email = ?", email).Scan(&userID, &storedPassword)
 	if err != nil {
-		return fmt.Errorf("failed to get hashed password: %v", err)
+		return 0, err
 	}
 
-	// Compare the hashed password with the input password
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	if err != nil {
-		return errors.New("invalid email or password")
+	// Compare the stored password with the provided password
+	if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(password)); err != nil {
+		return 0, err
 	}
+
+	return userID, nil
+}
+
+// createSessionAndSetCookie stores the session in the database and sets the session token as a cookie
+func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, expiresAt time.Time) error {
+	// Delete any existing sessions for this user
+	_, err := db.Exec("DELETE FROM Sessions WHERE user_ID = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	// Store the session in the database
+	_, err = db.Exec("INSERT INTO Sessions (user_ID, token, expires_at) VALUES (?, ?, ?)", userID, token, expiresAt)
+	if err != nil {
+		return err
+	}
+
+	// Set the session token as a cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   token,
+		Expires: expiresAt,
+		Path:    "/",
+	})
 
 	return nil
 }

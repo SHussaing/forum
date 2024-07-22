@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	db "forum/Database"
+	db "forum/database"
 	"net/http"
 )
 

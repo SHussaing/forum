@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS Comment (
 CREATE TABLE IF NOT EXISTS Post_Likes (
     user_ID INTEGER,
     post_ID INTEGER,
-    status VARCHAR(255),
+    status VARCHAR(255) NOT NULL CHECK (status IN ('like', 'dislike')),
     PRIMARY KEY (user_ID, post_ID),
     FOREIGN KEY (user_ID) REFERENCES User(user_ID),
     FOREIGN KEY (post_ID) REFERENCES Post(post_ID)
@@ -41,8 +41,25 @@ CREATE TABLE IF NOT EXISTS Post_Likes (
 CREATE TABLE IF NOT EXISTS Comment_Likes (
     user_ID INTEGER,
     comment_ID INTEGER,
-    status VARCHAR(255),
+    status VARCHAR(255) NOT NULL CHECK (status IN ('like', 'dislike')),
     PRIMARY KEY (user_ID, comment_ID),
     FOREIGN KEY (user_ID) REFERENCES User(user_ID),
     FOREIGN KEY (comment_ID) REFERENCES Comment(comment_ID)
 );
+
+CREATE TABLE IF NOT EXISTS Post_Categories (
+    post_ID INTEGER NOT NULL,
+    category_ID INTEGER NOT NULL,
+    PRIMARY KEY (post_ID, category_ID),
+    FOREIGN KEY (post_ID) REFERENCES Post(post_ID),
+    FOREIGN KEY (category_ID) REFERENCES Category(category_ID)
+);
+
+CREATE TABLE IF NOT EXISTS Sessions (
+    session_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_ID INTEGER NOT NULL,
+    token TEXT NOT NULL,
+    expires_at DATETIME NOT NULL,
+    FOREIGN KEY (user_ID) REFERENCES User(user_ID)
+);
+
