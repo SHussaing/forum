@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="Static/JS/Index.js"></script>
+    <script src="Static\JS\Index.js"></script>
     <title>Document</title>
     <style>
         .hidden {
@@ -16,5 +16,15 @@
     <a href="/Register" class="hide-on-login">Register</a>
     <a href="/Logout" class="show-on-login hidden">Logout</a>
     <a href="CreatePost" class="show-on-login hidden">Create Post</a>
+
+    <div id="postsContainer">
+        {{range .Posts}}
+        <div class="post">
+            <h2><a href="/Post?id={{.ID}}">{{.Title}}</a></h2>
+            <p>{{.Content}}</p>
+            <p>Categories: {{range .Categories}}{{.Name}}, {{end}}</p>
+        </div>
+        {{end}}
+    </div>
 </body>
 </html>

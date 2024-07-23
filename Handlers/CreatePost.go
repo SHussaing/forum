@@ -10,6 +10,10 @@ import (
 var tmpl = template.Must(template.ParseFiles("Templates/CreatePost.html"))
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	if !HasSessionToken(r) {
+		http.Redirect(w, r, "/Login", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodGet {
 		categories, err := db.GetAllCategories()
 		if err != nil {
