@@ -7,8 +7,6 @@ import (
 	"strconv"
 )
 
-var tmpl = template.Must(template.ParseFiles("Templates/CreatePost.html"))
-
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if !HasSessionToken(r) {
 		http.Redirect(w, r, "/Login", http.StatusSeeOther)
@@ -16,6 +14,11 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == http.MethodGet {
 		categories, err := db.GetAllCategories()
+		if err != nil {
+			handleError(w, http.StatusInternalServerError, err)
+			return
+		}
+		tmpl, err := template.ParseFiles("Templates/CreatePost.html")
 		if err != nil {
 			handleError(w, http.StatusInternalServerError, err)
 			return
