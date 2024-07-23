@@ -1,11 +1,16 @@
 package Handlers
 
 import (
+	"fmt"
 	db "forum/Database"
 	"net/http"
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	if HasSessionToken(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodGet {
 		http.ServeFile(w, r, "Templates/Register.html")
 		return
@@ -22,10 +27,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Redirect to index page
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/Login", http.StatusSeeOther)
 
 		return
 	}
 
-	w.WriteHeader(http.StatusMethodNotAllowed)
+	handleError(w, http.StatusMethodNotAllowed, fmt.Errorf("method not allowed"))
 }

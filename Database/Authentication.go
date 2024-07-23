@@ -1,7 +1,7 @@
 package Database
 
 import (
-	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -57,7 +57,7 @@ func ValidateUserCredentials(email, password string) (int, error) {
 	return userID, nil
 }
 
-// createSessionAndSetCookie stores the session in the database and sets the session token as a cookie
+// Function to create a session and set a cookie
 func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, expiresAt time.Time) error {
 	// Delete any existing sessions for this user
 	_, err := Db.Exec("DELETE FROM Sessions WHERE user_ID = ?", userID)
@@ -71,35 +71,49 @@ func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, 
 		return err
 	}
 
-	// Set the session token as a cookie
+	// Set the session token as a cookie, accessible site-wide
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   token,
 		Expires: expiresAt,
+		Path:    "/", // Make the cookie accessible across the entire site
+	})
+
+	return nil
+}
+
+// Function to delete the session and remove the cookie
+func DeleteSessionAndRemoveCookie(w http.ResponseWriter, cookie *http.Cookie) error {
+	// Delete the session from the database
+	_, err := Db.Exec("DELETE FROM Sessions WHERE token = ?", cookie.Value)
+	if err != nil {
+		return err
+	}
+
+	// Remove the cookie by setting it with an expired date
+	http.SetCookie(w, &http.Cookie{
+		Name:    cookie.Name,
+		Value:   "",
+		Expires: time.Unix(0, 0),
 		Path:    "/",
 	})
 
 	return nil
 }
 
-func sessionMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session_token")
-		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
-		}
+func GetUserIDBySessionToken(r *http.Request) (int, error) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		return 0, errors.New("session token not found")
+	}
 
-		var userID int
-		var expiresAt time.Time
-		err = Db.QueryRow("SELECT user_ID, expires_at FROM Sessions WHERE token = ?", cookie.Value).Scan(&userID, &expiresAt)
-		if err != nil || time.Now().After(expiresAt) {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
+	var userID int
+	err = Db.QueryRow("SELECT user_ID FROM Sessions WHERE token = ?", cookie.Value).Scan(&userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, errors.New("session token not found")
 		}
-
-		// Add user ID to context
-		ctx := context.WithValue(r.Context(), "userID", userID)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+		return 0, err
+	}
+	return userID, nil
 }

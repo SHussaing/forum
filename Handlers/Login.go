@@ -1,19 +1,18 @@
 package Handlers
 
 import (
+	"fmt"
 	db "forum/Database"
 	"net/http"
 	"time"
-
-	"github.com/google/uuid"
 )
-
-func generateSessionToken() (string, error) {
-	return uuid.New().String(), nil
-}
 
 // LoginHandler handles the login request
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if HasSessionToken(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodGet {
 		http.ServeFile(w, r, "Templates/Login.html")
 		return
@@ -31,7 +30,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Generate a session token
-		token, err := generateSessionToken()
+		token, err := GenerateSessionToken()
 		if err != nil {
 			handleError(w, http.StatusInternalServerError, err)
 			return
@@ -48,31 +47,25 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Redirect to the index page
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-
+		return
 	}
 
+	handleError(w, http.StatusMethodNotAllowed, fmt.Errorf("method not allowed"))
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/Login", http.StatusFound)
 		return
 	}
 
-	_, err = db.Db.Exec("DELETE FROM Sessions WHERE token = ?", cookie.Value)
+	err = db.DeleteSessionAndRemoveCookie(w, cookie)
 	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		handleError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	// Clear the cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:   "session_token",
-		Value:  "",
-		MaxAge: -1,
-		Path:   "/",
-	})
-
-	http.Redirect(w, r, "/login", http.StatusFound)
+	// Redirect to the index page
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

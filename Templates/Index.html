@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="Static/JS/Index.js"></script>
     <title>Document</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <a href="/Login">Login</a>
-    <button onclick="logout()">Logout</button>
+    <a href="/Login" class="hide-on-login">Login</a>
+    <a href="/Register" class="hide-on-login">Register</a>
+    <a href="/Logout" class="show-on-login hidden">Logout</a>
+    <a href="CreatePost" class="show-on-login hidden">Create Post</a>
 </body>
 </html>

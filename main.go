@@ -16,6 +16,7 @@ func main() {
 	http.HandleFunc("/Login", handlers.LoginHandler)
 	http.HandleFunc("/Logout", handlers.LogoutHandler)
 	http.HandleFunc("/Register", handlers.RegisterHandler)
+	http.HandleFunc("/CreatePost", handlers.CreatePost)
 
 	fmt.Println("Server started at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

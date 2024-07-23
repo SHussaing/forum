@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post</title>
+    <script>
+        function validateForm() {
+            const checkboxes = document.querySelectorAll('input[name="categories"]');
+            const checked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+            if (!checked) {
+                alert('Please select at least one category.');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>Create a New Post</h1>
+    <form action="/CreatePost" method="post" onsubmit="return validateForm()">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" required></textarea><br><br>
+
+        <h3>Categories</h3>
+        {{range .Categories}}
+        <label>
+            <input type="checkbox" name="categories" value="{{.ID}}"> {{.Name}}
+        </label><br>
+        {{end}}
+
+        <input type="submit" value="Create Post">
+    </form>
+</body>
+</html>
