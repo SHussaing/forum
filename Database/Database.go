@@ -22,7 +22,7 @@ func init() {
 	}
 
 	// Read the SQL schema from the Schema.sql file
-	schemaFilePath := "Database/Schema.sql"
+	schemaFilePath := "Database/Design/Schema.sql"
 	schemaSQL, err := os.ReadFile(schemaFilePath)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to read schema file: %v", err))
@@ -36,7 +36,7 @@ func init() {
 
 	if !dbFileExists {
 		// Read the SQL data from the Data.sql file if the database file didn't exist
-		dataFilePath := "Database/Data.sql"
+		dataFilePath := "Database/Design/Data.sql"
 		dataSQL, err := os.ReadFile(dataFilePath)
 		if err != nil {
 			panic(fmt.Sprintf("Failed to read data file: %v", err))

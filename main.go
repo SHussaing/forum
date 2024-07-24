@@ -23,6 +23,7 @@ func main() {
 	http.HandleFunc("/DislikePost", handlers.DislikePostHandler)
 	http.HandleFunc("/LikeComment", handlers.LikeCommentHandler)
 	http.HandleFunc("/DislikeComment", handlers.DislikeCommentHandler)
+	http.HandleFunc("/Filter", handlers.FilterHandler)
 
 	fmt.Println("Server started at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

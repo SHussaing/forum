@@ -3,11 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="Static\JS\HideElements.js"></script>
+    <script src="Static/JS/HideElements.js"></script>
     <title>Document</title>
     <style>
         .hidden {
             display: none;
+        }
+        .post {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .filter {
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -16,6 +24,19 @@
     <a href="/Register" class="hide-on-login">Register</a>
     <a href="/Logout" class="show-on-login hidden">Logout</a>
     <a href="CreatePost" class="show-on-login hidden">Create Post</a>
+
+    <h1>Posts</h1>
+    <div class="filter">
+        <form action="/Filter" method="post">
+            <label class="show-on-login hidden"><input type="checkbox" name="filter" value="my_posts" class="show-on-login hidden"> My Posts</label>
+            <label class="show-on-login hidden"><input type="checkbox" name="filter" value="liked_posts" class="show-on-login hidden"> Liked Posts</label>
+            <h3>Categories:</h3>
+            {{range .Categories}}
+            <label><input type="checkbox" name="category" value="{{.ID}}"> {{.Name}}</label>
+            {{end}}
+            <button type="submit">Apply Filter</button>
+        </form>
+    </div>
 
     <div id="postsContainer">
         {{range .Posts}}

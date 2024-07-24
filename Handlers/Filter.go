@@ -2,23 +2,26 @@ package Handlers
 
 import (
 	"fmt"
-	db "forum/Database"
 	"html/template"
 	"net/http"
+	db "forum/Database"
 )
 
-type IndexPageData struct {
-	Posts      []db.Post
-	Categories []db.Category
-}
-
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		handleError(w, http.StatusNotFound, fmt.Errorf("page not found"))
+func FilterHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		handleError(w, http.StatusMethodNotAllowed, fmt.Errorf("method not allowed"))
 		return
 	}
 
-	posts, err := db.GetAllPosts()
+	r.ParseForm()
+
+	userID, err := db.GetUserIDBySessionToken(r)
+	isLoggedIn := err == nil
+
+	filters := r.Form["filter"]
+	categoryIDs := r.Form["category"]
+
+	posts, err := db.GetFilteredPosts(userID, filters, categoryIDs, isLoggedIn)
 	if err != nil {
 		handleError(w, http.StatusInternalServerError, err)
 		return
