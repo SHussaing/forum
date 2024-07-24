@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func GetPost(w http.ResponseWriter, r *http.Request) {
+func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 	// Get post ID from URL query parameter
 	postIDStr := r.URL.Query().Get("id")
 	postID, err := strconv.Atoi(postIDStr)
@@ -39,5 +39,31 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 	err = postTemplate.Execute(w, data)
 	if err != nil {
 		handleError(w, http.StatusInternalServerError, err)
+	}
+}
+
+func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		postIDStr := r.FormValue("post_id")
+		postID, err := strconv.Atoi(postIDStr)
+		if err != nil {
+			handleError(w, http.StatusBadRequest, err)
+			return
+		}
+		content := r.FormValue("content")
+
+		userID, err := db.GetUserIDBySessionToken(r)
+		if err != nil {
+			handleError(w, http.StatusUnauthorized, err)
+			return
+		}
+
+		err = db.AddComment(postID, userID, content)
+		if err != nil {
+			handleError(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		http.Redirect(w, r, "/Post?id="+postIDStr, http.StatusSeeOther)
 	}
 }

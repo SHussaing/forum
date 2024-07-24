@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func CreatePost(w http.ResponseWriter, r *http.Request) {
+func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	if !HasSessionToken(r) {
 		http.Redirect(w, r, "/Login", http.StatusSeeOther)
 		return

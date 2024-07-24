@@ -21,6 +21,7 @@
         {{range .Posts}}
         <div class="post">
             <h2><a href="/Post?id={{.ID}}">{{.Title}}</a></h2>
+            <p>By <span class="username">{{.Username}}</span></p>
             <p>{{.Content}}</p>
             <p>Categories: {{range .Categories}}{{.Name}}, {{end}}</p>
         </div>

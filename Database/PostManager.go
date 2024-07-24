@@ -11,6 +11,9 @@ type Post struct {
 	Title      string
 	Content    string
 	Categories []Category
+	Username   string
+	Likes      int
+	Dislikes   int
 }
 
 type Category struct {
@@ -23,10 +26,19 @@ type Comment struct {
 	PostID    int
 	UserID    int
 	Content   string
+	Username  string
+	Likes     int
+	Dislikes  int
 }
 
 func GetAllPosts() ([]Post, error) {
-	postRows, err := Db.Query("SELECT post_ID, user_ID, title, content FROM Post ORDER BY post_ID DESC")
+	query := `
+        SELECT p.post_ID, p.user_ID, p.title, p.content, u.username
+        FROM Post p
+        JOIN User u ON p.user_ID = u.user_ID
+        ORDER BY p.post_ID DESC`
+
+	postRows, err := Db.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +47,7 @@ func GetAllPosts() ([]Post, error) {
 	var posts []Post
 	for postRows.Next() {
 		var post Post
-		err := postRows.Scan(&post.ID, &post.UserID, &post.Title, &post.Content)
+		err := postRows.Scan(&post.ID, &post.UserID, &post.Title, &post.Content, &post.Username)
 		if err != nil {
 			return nil, err
 		}
@@ -75,8 +87,14 @@ func GetPostAndComments(postID int) (Post, []Comment, error) {
 	var post Post
 	var comments []Comment
 
-	// Get the post details
-	err := Db.QueryRow("SELECT post_ID, user_ID, title, content FROM Post WHERE post_ID = ?", postID).Scan(&post.ID, &post.UserID, &post.Title, &post.Content)
+	// Get the post details along with the username of the author, likes, and dislikes
+	err := Db.QueryRow(`
+		SELECT p.post_ID, p.user_ID, p.title, p.content, u.username,
+		       (SELECT COUNT(*) FROM Post_Likes WHERE post_ID = p.post_ID AND status = 'like') AS likes,
+		       (SELECT COUNT(*) FROM Post_Likes WHERE post_ID = p.post_ID AND status = 'dislike') AS dislikes
+		FROM Post p
+		JOIN User u ON p.user_ID = u.user_ID
+		WHERE p.post_ID = ?`, postID).Scan(&post.ID, &post.UserID, &post.Title, &post.Content, &post.Username, &post.Likes, &post.Dislikes)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return post, comments, errors.New("post not found")
@@ -84,8 +102,14 @@ func GetPostAndComments(postID int) (Post, []Comment, error) {
 		return post, comments, err
 	}
 
-	// Get the comments for the post
-	rows, err := Db.Query("SELECT comment_ID, post_ID, user_ID, content FROM Comment WHERE post_ID = ?", postID)
+	// Get the comments for the post along with likes and dislikes
+	rows, err := Db.Query(`
+		SELECT c.comment_ID, c.post_ID, c.user_ID, c.content, u.username,
+		       (SELECT COUNT(*) FROM Comment_Likes WHERE comment_ID = c.comment_ID AND status = 'like') AS likes,
+		       (SELECT COUNT(*) FROM Comment_Likes WHERE comment_ID = c.comment_ID AND status = 'dislike') AS dislikes
+		FROM Comment c
+		JOIN User u ON c.user_ID = u.user_ID
+		WHERE c.post_ID = ?`, postID)
 	if err != nil {
 		return post, comments, err
 	}
@@ -93,7 +117,7 @@ func GetPostAndComments(postID int) (Post, []Comment, error) {
 
 	for rows.Next() {
 		var comment Comment
-		err := rows.Scan(&comment.CommentID, &comment.PostID, &comment.UserID, &comment.Content)
+		err := rows.Scan(&comment.CommentID, &comment.PostID, &comment.UserID, &comment.Content, &comment.Username, &comment.Likes, &comment.Dislikes)
 		if err != nil {
 			return post, comments, err
 		}
@@ -147,5 +171,10 @@ func CreatePost(title, content string, userID int) (int, error) {
 
 func AddPostCategory(postID, categoryID int) error {
 	_, err := Db.Exec("INSERT INTO Post_Categories (post_ID, category_ID) VALUES (?, ?)", postID, categoryID)
+	return err
+}
+
+func AddComment(postID, userID int, content string) error {
+	_, err := Db.Exec("INSERT INTO Comment (post_ID, user_ID, content) VALUES (?, ?, ?)", postID, userID, content)
 	return err
 }

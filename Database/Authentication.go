@@ -46,7 +46,7 @@ func ValidateUserCredentials(email, password string) (int, error) {
 	var storedPassword string
 	err := Db.QueryRow("SELECT user_ID, password FROM User WHERE email = ?", email).Scan(&userID, &storedPassword)
 	if err != nil {
-		return 0, err
+		return 0, errors.New("invalid email or password")
 	}
 
 	// Compare the stored password with the provided password
