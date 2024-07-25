@@ -1,0 +1,28 @@
+.hidden {
+    display: none;
+}
+.post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.filter {
+    margin-bottom: 20px;
+}
+
+.home-icon{
+    max-height: 150px;
+    max-width: 150px;
+}
+
+.post, .comment {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.actions {
+    margin-top: 10px;
+}
+.username {
+    font-weight: bold;
+}

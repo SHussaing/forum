@@ -3,23 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Static\CSS\Shared.css">
     <script src="Static/JS/HideElements.js"></script>
-    <title>Post</title>
-    <style>
-        .post, .comment {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        .actions {
-            margin-top: 10px;
-        }
-        .username {
-            font-weight: bold;
-        }
-    </style>
+    <title>Forum | Post</title>
 </head>
 <body>
+    <a href="/">
+        <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+    </a>
     <div class="post">
         <h2>{{.Post.Title}}</h2>
         <p>By <span class="username">{{.Post.Username}}</span></p>

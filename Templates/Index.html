@@ -4,22 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="Static/JS/HideElements.js"></script>
-    <title>Document</title>
-    <style>
-        .hidden {
-            display: none;
-        }
-        .post {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        .filter {
-            margin-bottom: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="Static\CSS\Shared.css">
+    <title>Forum</title>
 </head>
 <body>
+    <a href="/">
+        <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+    </a>
     <a href="/Login" class="hide-on-login">Login</a>
     <a href="/Register" class="hide-on-login">Register</a>
     <a href="/Logout" class="show-on-login hidden">Logout</a>

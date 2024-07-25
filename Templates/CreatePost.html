@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post</title>
+    <link rel="stylesheet" href="Static\CSS\Shared.css">
+    <title>Forum | Create Post</title>
     <script>
         function validateForm() {
             const checkboxes = document.querySelectorAll('input[name="categories"]');
@@ -19,6 +20,9 @@
     </script>
 </head>
 <body>
+    <a href="/">
+        <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+    </a>
     <h1>Create a New Post</h1>
     <form action="/CreatePost" method="post" onsubmit="return validateForm()">
         <label for="title">Title:</label>
