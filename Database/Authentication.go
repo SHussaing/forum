@@ -122,7 +122,6 @@ func GetUserIDBySessionToken(r *http.Request) (int, error) {
 func HasSessionToken(r *http.Request) bool {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		println("no cookie in browser") 
 		return false
 	}
 
@@ -134,9 +133,7 @@ func HasSessionToken(r *http.Request) bool {
 			return false // Token not found in database
 		}
 		// Handle other potential errors
-		println("no cookie in database")
 		return false
 	}
-	println("cookie found in browser and database")
 	return true
 }

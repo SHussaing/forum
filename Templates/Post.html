@@ -6,6 +6,15 @@
     <link rel="stylesheet" href="Static\CSS\Shared.css">
     <script src="Static/JS/HideElements.js"></script>
     <title>Forum | Post</title>
+    <script>
+        function validateForm() {
+            const content = document.getElementById('content').value.trim();
+            if (content === '') {
+                alert('Comment cannot be empty');
+                return false;
+            }
+        }
+    </script>
 </head>
 <body>
     <a href="/">
@@ -50,9 +59,9 @@
     {{end}}
 
     <h3 class="show-on-login hidden">Add a Comment</h3>
-    <form action="/AddComment" method="post" class="show-on-login hidden">
+    <form action="/AddComment" method="post" class="show-on-login hidden" onsubmit="return validateForm()">
         <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <textarea name="content" rows="4" cols="50" required></textarea><br>
+        <textarea name="content" id="content" rows="4" cols="50" required></textarea><br>
         <button type="submit">Add Comment</button>
     </form>
 </body>

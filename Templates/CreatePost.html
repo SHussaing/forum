@@ -7,8 +7,20 @@
     <title>Forum | Create Post</title>
     <script>
         function validateForm() {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
             const checkboxes = document.querySelectorAll('input[name="categories"]');
             const checked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+            if (title === '') {
+                alert('Title cannot be empty');
+                return false;
+            }
+
+            if (content === '') {
+                alert('Content cannot be empty');
+                return false;
+            }
 
             if (!checked) {
                 alert('Please select at least one category.');

@@ -43,12 +43,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Set session expiration (e.g., 24 hours)
-		expiresAt := time.Now().Add(24 * time.Hour)
+		// Set session expiration (6 hours)
+		expiresAt := time.Now().Add(6 * time.Hour)
 
 		// Store the session in the database and set the cookie
 		if err := db.CreateSessionAndSetCookie(w, userID, token, expiresAt); err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			handleError(w, http.StatusInternalServerError, err)
 			return
 		}
 
