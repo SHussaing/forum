@@ -5,11 +5,18 @@ import (
 	db "forum/Database"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
+
+// Function to generate a session token
+func GenerateSessionToken() (string, error) {
+	return uuid.New().String(), nil
+}
 
 // LoginHandler handles the login request
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if HasSessionToken(r) {
+	if db.HasSessionToken(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

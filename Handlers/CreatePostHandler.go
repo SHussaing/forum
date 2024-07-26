@@ -8,7 +8,7 @@ import (
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-	if !HasSessionToken(r) {
+	if !db.HasSessionToken(r) {
 		http.Redirect(w, r, "/Login", http.StatusSeeOther)
 		return
 	}

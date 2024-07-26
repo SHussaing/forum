@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS Post_Categories (
     FOREIGN KEY (category_ID) REFERENCES Category(category_ID)
 );
 
-CREATE TABLE IF NOT EXISTS Sessions (
+CREATE TABLE IF NOT EXISTS Session (
     session_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_ID INTEGER NOT NULL,
     token TEXT NOT NULL,

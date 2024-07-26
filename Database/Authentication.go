@@ -60,13 +60,13 @@ func ValidateUserCredentials(email, password string) (int, error) {
 // Function to create a session and set a cookie
 func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, expiresAt time.Time) error {
 	// Delete any existing sessions for this user
-	_, err := Db.Exec("DELETE FROM Sessions WHERE user_ID = ?", userID)
+	_, err := Db.Exec("DELETE FROM Session WHERE user_ID = ?", userID)
 	if err != nil {
 		return err
 	}
 
 	// Store the session in the database
-	_, err = Db.Exec("INSERT INTO Sessions (user_ID, token, expires_at) VALUES (?, ?, ?)", userID, token, expiresAt)
+	_, err = Db.Exec("INSERT INTO Session (user_ID, token, expires_at) VALUES (?, ?, ?)", userID, token, expiresAt)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, 
 // Function to delete the session and remove the cookie
 func DeleteSessionAndRemoveCookie(w http.ResponseWriter, cookie *http.Cookie) error {
 	// Delete the session from the database
-	_, err := Db.Exec("DELETE FROM Sessions WHERE token = ?", cookie.Value)
+	_, err := Db.Exec("DELETE FROM Session WHERE token = ?", cookie.Value)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func GetUserIDBySessionToken(r *http.Request) (int, error) {
 	}
 
 	var userID int
-	err = Db.QueryRow("SELECT user_ID FROM Sessions WHERE token = ?", cookie.Value).Scan(&userID)
+	err = Db.QueryRow("SELECT user_ID FROM Session WHERE token = ?", cookie.Value).Scan(&userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return 0, errors.New("session token not found")
@@ -116,4 +116,27 @@ func GetUserIDBySessionToken(r *http.Request) (int, error) {
 		return 0, err
 	}
 	return userID, nil
+}
+
+// Function to check if the session_token cookie exists and is valid in the database
+func HasSessionToken(r *http.Request) bool {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		println("no cookie in browser") 
+		return false
+	}
+
+	// If the cookie is found, check if it exists in the database
+	var userID int
+	err = Db.QueryRow("SELECT user_ID FROM Session WHERE token = ?", cookie.Value).Scan(&userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false // Token not found in database
+		}
+		// Handle other potential errors
+		println("no cookie in database")
+		return false
+	}
+	println("cookie found in browser and database")
+	return true
 }
