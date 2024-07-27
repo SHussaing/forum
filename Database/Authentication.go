@@ -83,9 +83,16 @@ func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, 
 }
 
 // Function to delete the session and remove the cookie
-func DeleteSessionAndRemoveCookie(w http.ResponseWriter, cookie *http.Cookie) error {
+func DeleteSessionAndRemoveCookie(w http.ResponseWriter, r *http.Request) error {
+	// Get the session_token cookie
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		// If the cookie does not exist, nothing to do
+		return nil
+	}
+
 	// Delete the session from the database
-	_, err := Db.Exec("DELETE FROM Session WHERE token = ?", cookie.Value)
+	_, err = Db.Exec("DELETE FROM Session WHERE token = ?", cookie.Value)
 	if err != nil {
 		return err
 	}

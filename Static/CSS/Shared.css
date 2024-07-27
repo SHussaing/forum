@@ -26,3 +26,10 @@
 .username {
     font-weight: bold;
 }
+.nav-button {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}

@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="Static\CSS\Shared.css">
     <title>Forum | Login</title>
+    <script>
+        function validateForm() {
+            const email = document.querySelector('input[name="email"]').value.trim();
+            const password = document.querySelector('input[name="password"]').value.trim();
+
+            if (email === '' || password === '') {
+                alert('Email, and Password cannot be empty.');
+                return false;
+            }
+
+            if (/\s/.test(email) || /\s/.test(password)) {
+                alert('Email, and Password cannot contain spaces.');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </head>
 <body>
     <a href="/">

@@ -9,6 +9,7 @@ import (
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	if !db.HasSessionToken(r) {
+		db.DeleteSessionAndRemoveCookie(w, r)
 		http.Redirect(w, r, "/Login", http.StatusSeeOther)
 		return
 	}

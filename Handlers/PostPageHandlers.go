@@ -43,6 +43,11 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
+	if !db.HasSessionToken(r) {
+		db.DeleteSessionAndRemoveCookie(w, r)
+		http.Redirect(w, r, "/Login", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodPost {
 		postIDStr := r.FormValue("post_id")
 		postID, err := strconv.Atoi(postIDStr)

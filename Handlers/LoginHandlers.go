@@ -61,13 +61,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		http.Redirect(w, r, "/Login", http.StatusFound)
-		return
-	}
-
-	err = db.DeleteSessionAndRemoveCookie(w, cookie)
+	err := db.DeleteSessionAndRemoveCookie(w, r)
 	if err != nil {
 		handleError(w, http.StatusInternalServerError, err)
 		return
