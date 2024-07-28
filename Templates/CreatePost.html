@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="Static/JS/HideElements.js"></script>
     <link rel="stylesheet" href="Static\CSS\Shared.css">
     <title>Forum | Create Post</title>
     <script>
@@ -32,25 +33,38 @@
     </script>
 </head>
 <body>
-    <a href="/">
-        <img src="Static\Images\Home.png" alt="Home" class="home-icon">
-    </a>
-    <h1>Create a New Post</h1>
-    <form action="/CreatePost" method="post" onsubmit="return validateForm()">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required><br><br>
+    <div class="header">
+        <nav class="nav-bar">
+            <a href="/" class="home-link">
+                <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+            </a>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/Logout'">Logout</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/CreatePost'">Create Post</button>
+        </nav>
+    </div>
+    <div class="container">
+        <h1>Create a New Post</h1>
+        <form action="/CreatePost" method="post" onsubmit="return validateForm()">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
 
-        <label for="content">Content:</label>
-        <textarea id="content" name="content" required></textarea><br><br>
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" required></textarea>
 
-        <h3>Categories</h3>
-        {{range .Categories}}
-        <label>
-            <input type="checkbox" name="categories" value="{{.ID}}"> {{.Name}}
-        </label><br>
-        {{end}}
+            <h3>Categories</h3>
+            <div class="categories-container">
+                {{range .Categories}}
+                <div class="category-item">
+                    <label for="category-{{.ID}}" class="category-label">{{.Name}}</label>
+                    <input type="checkbox" id="category-{{.ID}}" name="categories" value="{{.ID}}">
+                </div>
+                {{end}}
+            </div>
 
-        <input type="submit" value="Create Post">
-    </form>
+            <input type="submit" value="Create Post">
+        </form>
+    </div>
 </body>
 </html>

@@ -17,52 +17,63 @@
     </script>
 </head>
 <body>
-    <a href="/">
-        <img src="Static\Images\Home.png" alt="Home" class="home-icon">
-    </a>
-    <div class="post">
-        <h2>{{.Post.Title}}</h2>
-        <p>By <span class="username">{{.Post.Username}}</span></p>
-        <p>{{.Post.Content}}</p>
-        <div class="actions">
-            <p>Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}</p>
-            <form action="/LikePost" method="post" class="show-on-login hidden">
-                <input type="hidden" name="post_id" value="{{.Post.ID}}">
-                <button type="submit">Like</button>
-            </form>
-            <form action="/DislikePost" method="post" class="show-on-login hidden">
-                <input type="hidden" name="post_id" value="{{.Post.ID}}">
-                <button type="submit">Dislike</button>
-            </form>
-        </div>
+    <div class="header">
+        <nav class="nav-bar">
+            <a href="/" class="home-link">
+                <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+            </a>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/Logout'">Logout</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/CreatePost'">Create Post</button>
+        </nav>
     </div>
 
-    <h3>Comments</h3>
-    {{range .Comments}}
-    <div class="comment">
-        <p><span class="username">{{.Username}}</span>:</p>
-        <p>{{.Content}}</p>
-        <div class="actions">
-            <p>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</p>
-            <form action="/LikeComment" method="post" class="show-on-login hidden">
-                <input type="hidden" name="comment_id" value="{{.CommentID}}">
-                <input type="hidden" name="post_id" value="{{$.Post.ID}}">
-                <button type="submit">Like</button>
-            </form>
-            <form action="/DislikeComment" method="post" class="show-on-login hidden">
-                <input type="hidden" name="comment_id" value="{{.CommentID}}">
-                <input type="hidden" name="post_id" value="{{$.Post.ID}}">
-                <button type="submit">Dislike</button>
-            </form>
+    <div class="container">
+        <div class="post">
+            <h2>{{.Post.Title}}</h2>
+            <p>By <span class="username">{{.Post.Username}}</span></p>
+            <p>{{.Post.Content}}</p>
+            <div class="actions">
+                <p>Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}</p>
+                <form action="/LikePost" method="post" class="show-on-login hidden">
+                    <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                    <button type="submit" class="like-button">Like</button>
+                </form>
+                <form action="/DislikePost" method="post" class="show-on-login hidden">
+                    <input type="hidden" name="post_id" value="{{.Post.ID}}">
+                    <button type="submit" class="dislike-button">Dislike</button>
+                </form>
+            </div>
         </div>
-    </div>
-    {{end}}
 
-    <h3 class="show-on-login hidden">Add a Comment</h3>
-    <form action="/AddComment" method="post" class="show-on-login hidden" onsubmit="return validateForm()">
-        <input type="hidden" name="post_id" value="{{.Post.ID}}">
-        <textarea name="content" id="content" rows="4" cols="50" required></textarea><br>
-        <button type="submit">Add Comment</button>
-    </form>
+        <h3>Comments</h3>
+        {{range .Comments}}
+        <div class="comment">
+            <p><span class="username">{{.Username}}</span>:</p>
+            <p>{{.Content}}</p>
+            <div class="actions">
+                <p>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</p>
+                <form action="/LikeComment" method="post" class="show-on-login hidden">
+                    <input type="hidden" name="comment_id" value="{{.CommentID}}">
+                    <input type="hidden" name="post_id" value="{{$.Post.ID}}">
+                    <button type="submit" class="like-button">Like</button>
+                </form>
+                <form action="/DislikeComment" method="post" class="show-on-login hidden">
+                    <input type="hidden" name="comment_id" value="{{.CommentID}}">
+                    <input type="hidden" name="post_id" value="{{$.Post.ID}}">
+                    <button type="submit" class="dislike-button">Dislike</button>
+                </form>
+            </div>
+        </div>
+        {{end}}
+
+        <h3 class="show-on-login hidden">Add a Comment</h3>
+        <form action="/AddComment" method="post" class="show-on-login hidden" onsubmit="return validateForm()">
+            <input type="hidden" name="post_id" value="{{.Post.ID}}">
+            <textarea name="content" id="content" rows="4" cols="50" required></textarea><br>
+            <button type="submit">Add Comment</button>
+        </form>
+    </div>
 </body>
 </html>

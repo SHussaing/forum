@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="Static/JS/HideElements.js"></script>
     <link rel="stylesheet" href="Static/CSS/Shared.css">
     <title>Forum | Registration</title>
     <script>
@@ -26,9 +27,17 @@
     </script>
 </head>
 <body>
-    <a href="/">
-        <img src="Static/Images/Home.png" alt="Home" class="home-icon">
-    </a>
+    <div class="header">
+        <nav class="nav-bar">
+            <a href="/" class="home-link">
+                <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+            </a>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/Logout'">Logout</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/CreatePost'">Create Post</button>
+        </nav>
+    </div>
     <div class="container">
         <h2>Register</h2>
         <form action="/Register" method="post" onsubmit="return validateForm()">

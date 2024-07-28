@@ -4,40 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="Static/JS/HideElements.js"></script>
+    <script src="Static/JS/Truncate.js"></script>
     <link rel="stylesheet" href="Static\CSS\Shared.css">
     <title>Forum</title>
 </head>
 <body>
-    <a href="/">
-        <img src="Static\Images\Home.png" alt="Home" class="home-icon">
-    </a>
-    <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
-    <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
-    <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/Logout'">Logout</button>
-    <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/CreatePost'">Create Post</button>
-
-    <h1>Posts</h1>
-    <div class="filter">
-        <form action="/Filter" method="post">
-            <label class="show-on-login hidden"><input type="checkbox" name="filter" value="my_posts" class="show-on-login hidden"> My Posts</label>
-            <label class="show-on-login hidden"><input type="checkbox" name="filter" value="liked_posts" class="show-on-login hidden"> Liked Posts</label>
-            <h3>Categories:</h3>
-            {{range .Categories}}
-            <label><input type="checkbox" name="category" value="{{.ID}}"> {{.Name}}</label>
-            {{end}}
-            <button type="submit">Apply Filter</button>
-        </form>
+    <div class="header">
+        <nav class="nav-bar">
+            <a href="/" class="home-link">
+                <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+            </a>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
+            <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/Logout'">Logout</button>
+            <button type="button" class="nav-button show-on-login hidden" onclick="window.location.href='/CreatePost'">Create Post</button>
+        </nav>
     </div>
-
-    <div id="postsContainer">
-        {{range .Posts}}
-        <div class="post">
-            <h2><a href="/Post?id={{.ID}}">{{.Title}}</a></h2>
-            <p>By <span class="username">{{.Username}}</span></p>
-            <p>{{.Content}}</p>
-            <p>Categories: {{range .Categories}}{{.Name}}, {{end}}</p>
+    <main>
+        <div class="filter">
+            <h1>Filter</h1>
+            <form action="/Filter" method="post">
+                <label class="show-on-login hidden"><input type="checkbox" name="filter" value="my_posts"> My Posts</label>
+                <label class="show-on-login hidden"><input type="checkbox" name="filter" value="liked_posts"> Liked Posts</label>
+                <h3>Categories:</h3>
+                {{range .Categories}}
+                <label><input type="checkbox" name="category" value="{{.ID}}"> {{.Name}}</label>
+                {{end}}
+                <button type="submit">Apply Filter</button>
+            </form>
         </div>
-        {{end}}
-    </div>
+        <h1>Posts</h1>
+        <div id="postsContainer">
+            {{range .Posts}}
+            <div class="post">
+                <h2><a href="/Post?id={{.ID}}" class="post-title">{{.Title}}</a></h2>
+                <p>By <span class="username">{{.Username}}</span></p>
+                <p class="post-content">{{.Content}}</p>
+                <p>Categories: {{range .Categories}}{{.Name}}, {{end}}</p>
+            </div>
+            {{end}}
+        </div>
+    </main>
 </body>
 </html>
