@@ -35,7 +35,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Categories: categories,
 	}
 
-	tmpl, err := template.ParseFiles("Templates/index.html")
+	tmpl, err := template.ParseFiles("Templates/Index.html")
 	if err != nil {
 		handleError(w, http.StatusInternalServerError, err)
 		return
