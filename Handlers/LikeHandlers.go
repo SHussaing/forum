@@ -8,6 +8,11 @@ import (
 )
 
 func LikePostHandler(w http.ResponseWriter, r *http.Request) {
+	if !db.HasSessionToken(r) {
+		db.DeleteSessionAndRemoveCookie(w, r)
+		http.Redirect(w, r, "/Login", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodPost {
 		postIDStr := r.FormValue("post_id")
 		postID, err := strconv.Atoi(postIDStr)
@@ -33,6 +38,11 @@ func LikePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DislikePostHandler(w http.ResponseWriter, r *http.Request) {
+	if !db.HasSessionToken(r) {
+		db.DeleteSessionAndRemoveCookie(w, r)
+		http.Redirect(w, r, "/Login", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodPost {
 		postIDStr := r.FormValue("post_id")
 		postID, err := strconv.Atoi(postIDStr)
@@ -59,6 +69,11 @@ func DislikePostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LikeCommentHandler(w http.ResponseWriter, r *http.Request) {
+	if !db.HasSessionToken(r) {
+		db.DeleteSessionAndRemoveCookie(w, r)
+		http.Redirect(w, r, "/Login", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodPost {
 		r.ParseForm()                       
 		userID, err := db.GetUserIDBySessionToken(r)
@@ -85,6 +100,11 @@ func LikeCommentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DislikeCommentHandler(w http.ResponseWriter, r *http.Request) {
+	if !db.HasSessionToken(r) {
+		db.DeleteSessionAndRemoveCookie(w, r)
+		http.Redirect(w, r, "/Login", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodPost {
 		r.ParseForm()                       
 		userID, err := db.GetUserIDBySessionToken(r)
