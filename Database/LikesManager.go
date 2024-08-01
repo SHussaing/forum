@@ -69,3 +69,35 @@ func handleCommentLike(userID, commentID int, action string) error {
 	_, err = Db.Exec("UPDATE Comment_Likes SET status = ? WHERE user_ID = ? AND comment_ID = ?", action, userID, commentID)
 	return err
 }
+
+// GetPostLikes returns the number of likes and dislikes for a post
+func GetPostLikes(postID int) (int, int, error) {
+	var likes, dislikes int
+	err := Db.QueryRow("SELECT COUNT(*) FROM Post_Likes WHERE post_ID = ? AND status = 'like'", postID).Scan(&likes)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = Db.QueryRow("SELECT COUNT(*) FROM Post_Likes WHERE post_ID = ? AND status = 'dislike'", postID).Scan(&dislikes)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return likes, dislikes, nil
+}
+
+// GetCommentLikes returns the number of likes and dislikes for a comment
+func GetCommentLikes(commentID int) (int, int, error) {
+	var likes, dislikes int
+	err := Db.QueryRow("SELECT COUNT(*) FROM Comment_Likes WHERE comment_ID = ? AND status = 'like'", commentID).Scan(&likes)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	err = Db.QueryRow("SELECT COUNT(*) FROM Comment_Likes WHERE comment_ID = ? AND status = 'dislike'", commentID).Scan(&dislikes)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return likes, dislikes, nil
+}

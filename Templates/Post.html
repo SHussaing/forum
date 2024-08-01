@@ -5,16 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="Static\CSS\Shared.css">
     <script src="Static/JS/HideElements.js"></script>
+    <script src="Static/JS/Likes.js"></script>
+    <script src="Static/JS/Comments.js"></script>
     <title>Forum | Post</title>
-    <script>
-        function validateForm() {
-            const content = document.getElementById('content').value.trim();
-            if (content === '') {
-                alert('Comment cannot be empty');
-                return false;
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="header">
@@ -35,41 +28,29 @@
             <p>By <span class="username">{{.Post.Username}}</span></p>
             <p>{{.Post.Content}}</p>
             <div class="actions">
-                <p>Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}</p>
-                <form action="/LikePost" method="post" class="show-on-login hidden">
-                    <input type="hidden" name="post_id" value="{{.Post.ID}}">
-                    <button type="submit" class="like-button">Like</button>
-                </form>
-                <form action="/DislikePost" method="post" class="show-on-login hidden">
-                    <input type="hidden" name="post_id" value="{{.Post.ID}}">
-                    <button type="submit" class="dislike-button">Dislike</button>
-                </form>
+                <p id="post-likes-dislikes">Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}</p>
+                <button class="like-button show-on-login hidden" onclick="handleLikeDislike('post', {{.Post.ID}}, 'like')">Like</button>
+                <button class="dislike-button show-on-login hidden" onclick="handleLikeDislike('post', {{.Post.ID}}, 'dislike')">Dislike</button>
             </div>
         </div>
 
         <h3>Comments</h3>
-        {{range .Comments}}
-        <div class="comment">
-            <p><span class="username">{{.Username}}</span>:</p>
-            <p>{{.Content}}</p>
-            <div class="actions">
-                <p>Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</p>
-                <form action="/LikeComment" method="post" class="show-on-login hidden">
-                    <input type="hidden" name="comment_id" value="{{.CommentID}}">
-                    <input type="hidden" name="post_id" value="{{$.Post.ID}}">
-                    <button type="submit" class="like-button">Like</button>
-                </form>
-                <form action="/DislikeComment" method="post" class="show-on-login hidden">
-                    <input type="hidden" name="comment_id" value="{{.CommentID}}">
-                    <input type="hidden" name="post_id" value="{{$.Post.ID}}">
-                    <button type="submit" class="dislike-button">Dislike</button>
-                </form>
+        <div id="comments-section">
+            {{range .Comments}}
+            <div class="comment" id="comment-{{.CommentID}}">
+                <p><span class="username">{{.Username}}</span>:</p>
+                <p>{{.Content}}</p>
+                <div class="actions">
+                    <p id="comment-likes-dislikes-{{.CommentID}}">Likes: {{.Likes}}, Dislikes: {{.Dislikes}}</p>
+                    <button class="like-button show-on-login hidden" onclick="handleLikeDislike('comment', {{.CommentID}}, 'like')">Like</button>
+                    <button class="dislike-button show-on-login hidden" onclick="handleLikeDislike('comment', {{.CommentID}}, 'dislike')">Dislike</button>
+                </div>
             </div>
+            {{end}}
         </div>
-        {{end}}
 
         <h3 class="show-on-login hidden">Add a Comment</h3>
-        <form action="/AddComment" method="post" class="show-on-login hidden" onsubmit="return validateForm()">
+        <form id="comment-form" class="show-on-login hidden" onsubmit="return addComment(event)">
             <input type="hidden" name="post_id" value="{{.Post.ID}}">
             <textarea name="content" id="content" rows="4" cols="50" required></textarea><br>
             <button type="submit">Add Comment</button>

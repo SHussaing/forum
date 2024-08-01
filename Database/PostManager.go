@@ -174,7 +174,23 @@ func AddPostCategory(postID, categoryID int) error {
 	return err
 }
 
-func AddComment(postID, userID int, content string) error {
-	_, err := Db.Exec("INSERT INTO Comment (post_ID, user_ID, content) VALUES (?, ?, ?)", postID, userID, content)
-	return err
+func AddComment(postID, userID int, content string) (int, error) {
+	result, err := Db.Exec("INSERT INTO Comment (post_ID, user_ID, content) VALUES (?, ?, ?)", postID, userID, content)
+	if err != nil {
+		return 0, err
+	}
+	commentID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(commentID), nil
+}
+
+func GetUsernameByID(userID int) (string, error) {
+	var username string
+	err := Db.QueryRow("SELECT username FROM User WHERE user_ID = ?", userID).Scan(&username)
+	if err != nil {
+		return "", err
+	}
+	return username, nil
 }

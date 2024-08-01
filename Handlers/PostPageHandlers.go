@@ -1,6 +1,7 @@
 package Handlers
 
 import (
+	"encoding/json"
 	db "forum/Database"
 	"html/template"
 	"net/http"
@@ -63,12 +64,24 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = db.AddComment(postID, userID, content)
+		commentID, err := db.AddComment(postID, userID, content)
 		if err != nil {
 			handleError(w, http.StatusInternalServerError, err)
 			return
 		}
 
-		http.Redirect(w, r, "/Post?id="+postIDStr, http.StatusSeeOther)
+		username, err := db.GetUsernameByID(userID)
+		if err != nil {
+			handleError(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		response := map[string]interface{}{
+			"commentID": commentID,
+			"username":  username,
+			"content":   content,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	}
 }

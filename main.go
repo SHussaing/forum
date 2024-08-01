@@ -19,10 +19,7 @@ func main() {
 	http.HandleFunc("/CreatePost", handlers.CreatePostHandler)
 	http.HandleFunc("/Post", handlers.GetPostHandler)
 	http.HandleFunc("/AddComment", handlers.AddCommentHandler)
-	http.HandleFunc("/LikePost", handlers.LikePostHandler)
-	http.HandleFunc("/DislikePost", handlers.DislikePostHandler)
-	http.HandleFunc("/LikeComment", handlers.LikeCommentHandler)
-	http.HandleFunc("/DislikeComment", handlers.DislikeCommentHandler)
+	http.HandleFunc("/LikeDislike", handlers.LikeDislikeHandler)
 	http.HandleFunc("/Filter", handlers.FilterHandler)
 
 	fmt.Println("Server started at http://localhost:8080")
