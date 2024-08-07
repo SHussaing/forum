@@ -7,37 +7,44 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// InsertUser inserts a new user into the User table
-func InsertUser(email, username, password string) error {
+// InsertUser inserts a new user into the User table and returns the user_ID
+func InsertUser(email, username, password string) (int64, error) {
 	// Check if email or username already exists
 	var exists bool
 	query := `SELECT EXISTS(SELECT 1 FROM User WHERE email = ? OR username = ?)`
 	err := Db.QueryRow(query, email, username).Scan(&exists)
 	if err != nil {
-		return fmt.Errorf("failed to check if user exists: %v", err)
+		return 0, fmt.Errorf("failed to check if user exists: %v", err)
 	}
 	if exists {
-		return errors.New("email or username already exists")
+		return 0, errors.New("email or username already exists")
 	}
 
 	// Encrypt the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return fmt.Errorf("failed to encrypt password: %v", err)
+		return 0, fmt.Errorf("failed to encrypt password: %v", err)
 	}
 
 	// Insert the new user
 	insertUserSQL := `INSERT INTO User (email, username, password) VALUES (?, ?, ?)`
-	_, err = Db.Exec(insertUserSQL, email, username, hashedPassword)
+	result, err := Db.Exec(insertUserSQL, email, username, hashedPassword)
 	if err != nil {
-		return fmt.Errorf("failed to insert user: %v", err)
+		return 0, fmt.Errorf("failed to insert user: %v", err)
 	}
 
-	return nil
+	// Get the last inserted ID
+	userID, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("failed to retrieve user ID: %v", err)
+	}
+
+	return userID, nil
 }
 
 // validateUserCredentials validates the user credentials and returns the user ID
@@ -57,18 +64,24 @@ func ValidateUserCredentials(email, password string) (int, error) {
 	return userID, nil
 }
 
-// Function to create a session and set a cookie
-func CreateSessionAndSetCookie(w http.ResponseWriter, userID int, token string, expiresAt time.Time) error {
+// CreateSessionAndSetCookie creates a session and sets a cookie for the user
+func CreateSessionAndSetCookie(w http.ResponseWriter, userID int) error {
+	// Generate a session token
+	token := uuid.New().String()
+
+	// Set session expiration (6 hours)
+	expiresAt := time.Now().Add(6 * time.Hour)
+
 	// Delete any existing sessions for this user
 	_, err := Db.Exec("DELETE FROM Session WHERE user_ID = ?", userID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to delete existing session: %v", err)
 	}
 
 	// Store the session in the database
 	_, err = Db.Exec("INSERT INTO Session (user_ID, token, expires_at) VALUES (?, ?, ?)", userID, token, expiresAt)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to insert session: %v", err)
 	}
 
 	// Set the session token as a cookie, accessible site-wide
@@ -108,23 +121,6 @@ func DeleteSessionAndRemoveCookie(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
-func GetUserIDBySessionToken(r *http.Request) (int, error) {
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		return 0, errors.New("session token not found")
-	}
-
-	var userID int
-	err = Db.QueryRow("SELECT user_ID FROM Session WHERE token = ?", cookie.Value).Scan(&userID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return 0, errors.New("session token not found")
-		}
-		return 0, err
-	}
-	return userID, nil
-}
-
 // Function to check if the session_token cookie exists and is valid in the database
 func HasSessionToken(r *http.Request) bool {
 	cookie, err := r.Cookie("session_token")
@@ -144,3 +140,22 @@ func HasSessionToken(r *http.Request) bool {
 	}
 	return true
 }
+
+func GetUserIDBySessionToken(r *http.Request) (int, error) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		return 0, errors.New("session token not found")
+	}
+
+	var userID int
+	err = Db.QueryRow("SELECT user_ID FROM Session WHERE token = ?", cookie.Value).Scan(&userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, errors.New("session token not found")
+		}
+		return 0, err
+	}
+	return userID, nil
+}
+
+

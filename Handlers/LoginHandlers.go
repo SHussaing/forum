@@ -4,15 +4,7 @@ import (
 	"fmt"
 	db "forum/Database"
 	"net/http"
-	"time"
-
-	"github.com/google/uuid"
 )
-
-// Function to generate a session token
-func GenerateSessionToken() (string, error) {
-	return uuid.New().String(), nil
-}
 
 // LoginHandler handles the login request
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,18 +28,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Generate a session token
-		token, err := GenerateSessionToken()
-		if err != nil {
-			handleError(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		// Set session expiration (6 hours)
-		expiresAt := time.Now().Add(6 * time.Hour)
-
-		// Store the session in the database and set the cookie
-		if err := db.CreateSessionAndSetCookie(w, userID, token, expiresAt); err != nil {
+		// Create a session and set the cookie
+		if err := db.CreateSessionAndSetCookie(w, userID); err != nil {
 			handleError(w, http.StatusInternalServerError, err)
 			return
 		}

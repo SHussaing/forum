@@ -11,6 +11,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+
 	if r.Method == http.MethodGet {
 		http.ServeFile(w, r, "Templates/Register.html")
 		return
@@ -20,15 +21,22 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		email := r.FormValue("email")
 		username := r.FormValue("username")
 		password := r.FormValue("password")
-		err := db.InsertUser(email, username, password)
+
+		// Insert user into the database
+		userID, err := db.InsertUser(email, username, password)
 		if err != nil {
 			handleError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		// Redirect to index page
-		http.Redirect(w, r, "/Login", http.StatusSeeOther)
+		// Create a session and set the cookie
+		if err := db.CreateSessionAndSetCookie(w, int(userID)); err != nil {
+			handleError(w, http.StatusInternalServerError, err)
+			return
+		}
 
+		// Redirect to the index page
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
