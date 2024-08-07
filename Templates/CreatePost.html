@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="Static/JS/HideElements.js"></script>
-    <link rel="stylesheet" href="Static\CSS\Shared.css">
+    <link rel="stylesheet" href="Static/CSS/Shared.css">
     <title>Forum | Create Post</title>
     <script>
         function validateForm() {
@@ -28,6 +28,21 @@
                 return false;
             }
 
+            // Validate the image upload
+            const image = document.getElementById('image').files[0];
+            if (image) {
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!allowedTypes.includes(image.type)) {
+                    alert('Only JPEG, PNG, and GIF image types are allowed.');
+                    return false;
+                }
+                const maxSize = 20 * 1024 * 1024; // 20 MB
+                if (image.size > maxSize) {
+                    alert('The image size must be less than 20 MB.');
+                    return false;
+                }
+            }
+
             return true;
         }
     </script>
@@ -36,7 +51,7 @@
     <div class="header">
         <nav class="nav-bar">
             <a href="/" class="home-link">
-                <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+                <img src="Static/Images/Home.png" alt="Home" class="home-icon">
             </a>
             <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
             <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
@@ -46,12 +61,15 @@
     </div>
     <div class="container">
         <h1>Create a New Post</h1>
-        <form action="/CreatePost" method="post" onsubmit="return validateForm()">
+        <form action="/CreatePost" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" required>
 
             <label for="content">Content:</label>
             <textarea id="content" name="content" required></textarea>
+
+            <label for="image">Upload Image (JPEG, PNG, GIF):</label>
+            <input type="file" id="image" name="image" accept="image/jpeg, image/png, image/gif" required>
 
             <h3>Categories</h3>
             <div class="categories-container">

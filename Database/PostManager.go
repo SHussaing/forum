@@ -155,8 +155,8 @@ func GetAllCategories() ([]Category, error) {
 	return categories, nil
 }
 
-func CreatePost(title, content string, userID int) (int, error) {
-	result, err := Db.Exec("INSERT INTO Post (title, content, user_ID) VALUES (?, ?, ?)", title, content, userID)
+func CreatePost(title, content string, userID int, imageData []byte) (int, error) {
+	result, err := Db.Exec("INSERT INTO Post (title, content, user_ID, image) VALUES (?, ?, ?, ?)", title, content, userID, imageData)
 	if err != nil {
 		return 0, err
 	}
