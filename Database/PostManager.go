@@ -131,6 +131,18 @@ func GetPostAndComments(postID int) (Post, []Comment, error) {
 	return post, comments, nil
 }
 
+func GetImageByPostID(postID int) ([]byte, error) {
+	var imageData []byte
+	err := Db.QueryRow("SELECT image FROM Post WHERE post_ID = ?", postID).Scan(&imageData)
+	if err != nil {
+		return nil, err
+	}
+	if imageData == nil {
+		return nil, errors.New("image not found")
+	}
+	return imageData, nil
+}
+
 func GetAllCategories() ([]Category, error) {
 	rows, err := Db.Query("SELECT category_ID, name FROM Category")
 	if err != nil {

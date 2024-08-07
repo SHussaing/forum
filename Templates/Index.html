@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="Static/JS/HideElements.js"></script>
     <script src="Static/JS/Truncate.js"></script>
-    <link rel="stylesheet" href="Static\CSS\Shared.css">
+    <script src="Static/JS/Image.js"></script>
+    <link rel="stylesheet" href="Static/CSS/Shared.css">
     <title>Forum</title>
 </head>
 <body>
     <div class="header">
         <nav class="nav-bar">
             <a href="/" class="home-link">
-                <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+                <img src="Static/Images/Home.png" alt="Home" class="home-icon">
             </a>
             <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
             <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
@@ -36,9 +37,11 @@
         <h1>Posts</h1>
         <div id="postsContainer">
             {{range .Posts}}
-            <div class="post">
+            <div class="post" id="post-{{.ID}}">
                 <h2><a href="/Post?id={{.ID}}" class="post-title">{{.Title}}</a></h2>
                 <p>By <span class="username">{{.Username}}</span></p>
+                <!-- Image with onerror to hide the element if it fails to load -->
+                <img src="/ServeImage?postID={{.ID}}" class="post-image" id="image-{{.ID}}" onerror="handleImageError('image-{{.ID}}');">
                 <p class="post-content">{{.Content}}</p>
                 <p>Categories: {{range .Categories}}{{.Name}}, {{end}}</p>
             </div>

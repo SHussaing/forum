@@ -43,6 +43,23 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ServeImageHandler(w http.ResponseWriter, r *http.Request) {
+	postID := r.URL.Query().Get("postID")
+	postIDInt, err := strconv.Atoi(postID)
+	if err != nil {
+		handleError(w, http.StatusBadRequest, err)
+		return
+	}
+	imageData, err := db.GetImageByPostID(postIDInt)
+	if err != nil {
+		handleError(w, http.StatusNotFound, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Write(imageData)
+}
+
 func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 	if !db.HasSessionToken(r) {
 		db.DeleteSessionAndRemoveCookie(w, r)

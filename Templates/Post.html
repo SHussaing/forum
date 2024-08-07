@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="Static\CSS\Shared.css">
+    <link rel="stylesheet" href="Static/CSS/Shared.css">
     <script src="Static/JS/HideElements.js"></script>
     <script src="Static/JS/Likes.js"></script>
     <script src="Static/JS/Comments.js"></script>
+    <script src="Static/JS/Image.js"></script>
     <title>Forum | Post</title>
 </head>
 <body>
     <div class="header">
         <nav class="nav-bar">
             <a href="/" class="home-link">
-                <img src="Static\Images\Home.png" alt="Home" class="home-icon">
+                <img src="Static/Images/Home.png" alt="Home" class="home-icon">
             </a>
             <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Login'">Login</button>
             <button type="button" class="nav-button hide-on-login" onclick="window.location.href='/Register'">Register</button>
@@ -26,6 +27,7 @@
         <div class="post">
             <h2>{{.Post.Title}}</h2>
             <p>By <span class="username">{{.Post.Username}}</span></p>
+            <img src="/ServeImage?postID={{.Post.ID}}" class="post-image" id="image-{{.Post.ID}}" onerror="handleImageError('image-{{.Post.ID}}');">
             <p>{{.Post.Content}}</p>
             <div class="actions">
                 <p id="post-likes-dislikes">Likes: {{.Post.Likes}}, Dislikes: {{.Post.Dislikes}}</p>
